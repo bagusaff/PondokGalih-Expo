@@ -41,15 +41,3 @@ example
 # generated native folders
 /ios
 /android
-
-# local env
-.env
-
-# AI agent guidance / personal tooling config — local only, not part of the product
-.claude/settings.local.json
-.claude/**/node_modules/
-AGENTS.md
-.claude/**/.cache/
-
-# Agent-run scratch (audit ledgers, review packages) — never committed
-.superpowers/
