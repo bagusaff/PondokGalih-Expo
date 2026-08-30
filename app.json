@@ -3,7 +3,7 @@
     "name": "PondokGalihPOS",
     "slug": "PondokGalihPOS",
     "version": "1.0.0",
-    "orientation": "portrait",
+    "orientation": "landscape",
     "icon": "./assets/images/icon.png",
     "scheme": "pondokgalihpos",
     "userInterfaceStyle": "automatic",
@@ -11,6 +11,12 @@
       "icon": "./assets/expo.icon"
     },
     "android": {
+      "package": "com.pondokgalih.pos",
+      "permissions": [
+        "android.permission.BLUETOOTH_CONNECT",
+        "android.permission.BLUETOOTH_SCAN",
+        "android.permission.ACCESS_FINE_LOCATION"
+      ],
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",

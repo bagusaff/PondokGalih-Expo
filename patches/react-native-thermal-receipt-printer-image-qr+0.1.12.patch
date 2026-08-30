@@ -1,0 +1,32 @@
+diff --git a/node_modules/react-native-thermal-receipt-printer-image-qr/android/build.gradle b/node_modules/react-native-thermal-receipt-printer-image-qr/android/build.gradle
+index 1908273..946bf9e 100644
+--- a/node_modules/react-native-thermal-receipt-printer-image-qr/android/build.gradle
++++ b/node_modules/react-native-thermal-receipt-printer-image-qr/android/build.gradle
+@@ -1,12 +1,12 @@
+ apply plugin: 'com.android.library'
+ 
+ android {
+-    compileSdkVersion = 32
+-    buildToolsVersion = "32.0.0"
++    namespace "com.pinmi.react.printer"
++    compileSdkVersion = rootProject.hasProperty('compileSdkVersion') ? rootProject.compileSdkVersion : 36
+ 
+     defaultConfig {
+-        minSdkVersion 16
+-        targetSdkVersion 32
++        minSdkVersion rootProject.hasProperty('minSdkVersion') ? rootProject.minSdkVersion : 24
++        targetSdkVersion rootProject.hasProperty('targetSdkVersion') ? rootProject.targetSdkVersion : 36
+         versionCode 1
+         versionName "1.0"
+ 
+diff --git a/node_modules/react-native-thermal-receipt-printer-image-qr/android/src/main/AndroidManifest.xml b/node_modules/react-native-thermal-receipt-printer-image-qr/android/src/main/AndroidManifest.xml
+index 994865b..2709167 100644
+--- a/node_modules/react-native-thermal-receipt-printer-image-qr/android/src/main/AndroidManifest.xml
++++ b/node_modules/react-native-thermal-receipt-printer-image-qr/android/src/main/AndroidManifest.xml
+@@ -1,5 +1,4 @@
+-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+-    package="com.pinmi.react.printer">
++<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+ 
+     <uses-permission android:name="android.permission.INTERNET" />
+     <uses-permission android:name="android.permission.BLUETOOTH" />

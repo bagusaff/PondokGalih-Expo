@@ -1,0 +1,49 @@
+{
+  "cli": {
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "base": {
+      "platform": "android",
+      "env": {
+        "EXPO_PUBLIC_API_URL": "http://103.175.218.59/api"
+      }
+    },
+    "branded-dev": {
+      "extends": "base",
+      "developmentClient": true,
+      "distribution": "internal",
+      "env": {
+        "APP_VARIANT": "branded",
+        "EXPO_PUBLIC_HIDE_HISTORY": "true"
+      }
+    },
+    "branded-prod": {
+      "extends": "base",
+      "distribution": "internal",
+      "android": { "buildType": "apk" },
+      "env": {
+        "APP_VARIANT": "branded",
+        "EXPO_PUBLIC_HIDE_HISTORY": "true"
+      }
+    },
+    "generic-dev": {
+      "extends": "base",
+      "developmentClient": true,
+      "distribution": "internal",
+      "env": {
+        "APP_VARIANT": "generic",
+        "EXPO_PUBLIC_HIDE_HISTORY": "false"
+      }
+    },
+    "generic-prod": {
+      "extends": "base",
+      "distribution": "internal",
+      "android": { "buildType": "apk" },
+      "env": {
+        "APP_VARIANT": "generic",
+        "EXPO_PUBLIC_HIDE_HISTORY": "false"
+      }
+    }
+  }
+}
