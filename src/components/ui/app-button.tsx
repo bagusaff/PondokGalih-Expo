@@ -104,10 +104,14 @@ export function AppButton({
     };
   };
 
+  // Eva: filled buttons use white text EXCEPT filled basic (light grey bg),
+  // which keeps dark text — white-on-grey reads as disabled.
   const textColor = disabled
     ? colors.textDisabled
     : appearance === 'filled'
-      ? colors.textControl
+      ? status === 'basic'
+        ? colors.textBasic
+        : colors.textControl
       : status === 'basic'
         ? colors.textHint
         : statusColors[status];

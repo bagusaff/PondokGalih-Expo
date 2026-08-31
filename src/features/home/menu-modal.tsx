@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import {
-  KeyboardAvoidingView,
   ScrollView,
   StyleSheet,
   useWindowDimensions,
@@ -15,6 +14,7 @@ import {
   AppText,
 } from '@/components/ui';
 import { currencyFormatter } from '@/lib/currency-formatter';
+import { useKeyboardHeight } from '@/lib/use-keyboard-height';
 import { addOrderItem, useAppDispatch, useAppSelector } from '@/state';
 import { scale, verticalScale } from '@/theme';
 
@@ -29,7 +29,8 @@ type MenuModalProps = {
 
 export function MenuModal({ isOpen, hideModal, data }: MenuModalProps) {
   const dispatch = useAppDispatch();
-  const { width } = useWindowDimensions();
+  const { width, height } = useWindowDimensions();
+  const keyboardHeight = useKeyboardHeight();
 
   const [selectedVariant, setSelectedVariant] = useState<number | null>(null);
   const [selectedItem, setSelectedItem] = useState<number | null>(null);
@@ -82,8 +83,21 @@ export function MenuModal({ isOpen, hideModal, data }: MenuModalProps) {
 
   return (
     <AppModal visible={isOpen} onBackdropPress={hideModal}>
-      <KeyboardAvoidingView behavior="height">
-        <View style={[styles.Wrapper, { width: (3 / 4) * width }]}>
+      {/* Owner feedback (2026-08-31): fixed 85% height so variant/qty/
+          catatan are all visible without scrolling; when the keyboard is up
+          the card shrinks to the space left above it (AppModal pads the
+          backdrop by the keyboard height). */}
+      <View
+        style={[
+          styles.Wrapper,
+          {
+            width: (3 / 4) * width,
+            height:
+              keyboardHeight > 0
+                ? height - keyboardHeight - 24
+                : 0.85 * height,
+          },
+        ]}>
           <View style={styles.HeaderContainer}>
             <AppButton
               onPress={handleHideModal}
@@ -130,9 +144,11 @@ export function MenuModal({ isOpen, hideModal, data }: MenuModalProps) {
                     justifyContent: 'space-between',
                   }}>
                   {filteredVariant.map((item: any, index: number) => (
+                    // Owner feedback (2026-08-31): selected variant in green
+                    // (legacy grey "filled basic" read as disabled).
                     <AppButton
                       key={item.id}
-                      status="basic"
+                      status={item.id == selectedVariant ? 'primary' : 'basic'}
                       style={{ width: '32%', marginBottom: verticalScale(5) }}
                       appearance={item.id == selectedVariant ? 'filled' : 'outline'}
                       onPress={() => handleSetVariant(item.id, index)}>
@@ -206,8 +222,7 @@ export function MenuModal({ isOpen, hideModal, data }: MenuModalProps) {
               <AppDivider />
             </View>
           </ScrollView>
-        </View>
-      </KeyboardAvoidingView>
+      </View>
     </AppModal>
   );
 }
@@ -218,7 +233,6 @@ const styles = StyleSheet.create({
     padding: scale(10),
     borderRadius: 15,
     boxShadow: '0 4px 10px rgba(0, 0, 0, 0.25)',
-    maxHeight: '95%',
   },
   HeaderContainer: {
     flexDirection: 'row',

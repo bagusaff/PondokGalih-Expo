@@ -113,7 +113,7 @@ One replacement per UI Kitten primitive actually used, matching Eva's rendered C
 Commitments for the port (visuals stay identical):
 1. **Free wins from the platform**: New Architecture (JSI, no bridge), modern Hermes, React Compiler (enabled in app.json) for auto-memoization.
 2. **Narrow selectors**: screens select only the fields they render (`useAppSelector(s => s.order.orderItems.length)` style, `shallowEqual` where needed). The menu grid must NOT re-render when the cart changes — verify with React DevTools highlight during Phase 3.
-3. **List virtualization**: `FlashList` for menu grid, billing, and history lists; `React.memo` on `MenuCard`/`OrderMenuCard` rows with stable callbacks.
+3. **List virtualization**: `FlatList` + `React.memo` rows with stable callbacks. (Tried `FlashList` on the menu grid — reverted 2026-08-31: v2 flows grid columns independently/masonry-style, staggering variable-height cards and leaving blank holes on category switches. With narrow selectors + memoized cards, FlatList is smooth and row-aligned like legacy.)
 4. **Modals**: core RN `Modal` (native fade) via `AppModal`; heavy modal bodies (MenuModal, OrderModal) mount content lazily so the open animation never competes with layout work; any custom transitions run on the UI thread (Reanimated 4).
 5. **Images**: `expo-image` with caching for menu photos (placeholder identical to legacy).
 6. **No console noise in release**: `babel-plugin-transform-remove-console` for production builds (logs kept in dev).

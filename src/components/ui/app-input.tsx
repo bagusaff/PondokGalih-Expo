@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react';
+import { useState, type ReactNode, type Ref } from 'react';
 import {
   Text,
   TextInput,
@@ -29,6 +29,8 @@ export type AppInputProps = Omit<TextInputProps, 'style'> & {
   accessoryRight?: ReactNode;
   disabled?: boolean;
   style?: StyleProp<ViewStyle>;
+  // React 19 ref-as-prop; targets the inner TextInput (focus chaining).
+  ref?: Ref<TextInput>;
 };
 
 export function AppInput({
@@ -40,6 +42,7 @@ export function AppInput({
   style,
   onFocus,
   onBlur,
+  ref,
   ...rest
 }: AppInputProps) {
   const [focused, setFocused] = useState(false);
@@ -77,6 +80,7 @@ export function AppInput({
         {accessoryLeft}
         <TextInput
           {...rest}
+          ref={ref}
           editable={!disabled}
           placeholderTextColor={colors.textHint}
           onFocus={(e) => {

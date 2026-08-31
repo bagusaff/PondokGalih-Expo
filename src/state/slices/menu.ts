@@ -73,7 +73,12 @@ const menuSlice = createSlice({
     fetchMenuFavouriteSuccess(state, action: PayloadAction<any[]>) {
       const filteredFavouriteMenu: any[] = [];
       action?.payload.forEach((item) => {
-        filteredFavouriteMenu.push(item.item);
+        // Guard (2026-08-31): favourite rows whose menu item was deleted
+        // server-side arrive as { item: null } — legacy pushed the null and
+        // crashed the grid renderer.
+        if (item?.item) {
+          filteredFavouriteMenu.push(item.item);
+        }
       });
       state.loading = false;
       state.filteredMenuCategory = filteredFavouriteMenu;

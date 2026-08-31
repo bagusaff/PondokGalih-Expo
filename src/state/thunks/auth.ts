@@ -50,7 +50,9 @@ export const syncAllData = (token: string) => (dispatch: AppDispatch) => {
   api
     .get('/sync', {
       ...authHeader(token),
-      timeout: 5000,
+      // Legacy used 5000ms; shop Wi-Fi proved flaky, so give the sync
+      // payload more room before declaring failure.
+      timeout: 15000,
       timeoutErrorMessage: 'Timeout Fetching Data',
     })
     .then((res) => {

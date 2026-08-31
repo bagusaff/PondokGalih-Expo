@@ -7,7 +7,6 @@ import {
   Platform,
   ScrollView,
   StyleSheet,
-  TextInput,
   View,
 } from 'react-native';
 import {
@@ -24,6 +23,7 @@ import {
   AppButton,
   AppDivider,
   AppIcon,
+  AppInput,
   AppLayout,
   AppSpinner,
   AppText,
@@ -111,8 +111,13 @@ export default function PrinterRoute() {
         if (selectedValue === 'ble' && !(await ensureBlePermissions())) return;
         await Printer.init();
         const results = await Printer.getDeviceList();
+        // Net printers resolve undefined here — their results arrive via the
+        // NetPrinterEventEmitter listener below instead.
         setDevices(
-          results.map((item: any) => ({ ...item, printerType: selectedValue })),
+          (results ?? []).map((item: any) => ({
+            ...item,
+            printerType: selectedValue,
+          })),
         );
       } catch (err) {
         console.log('error', err);
@@ -274,50 +279,77 @@ export default function PrinterRoute() {
     setSelectedPrinter({});
   };
 
+  // Hints per printer type (owner feedback 2026-08-31: the screen needed
+  // labels/hints — an empty native Picker rendered as a lone chevron).
+  const typeHints: Record<string, string> = {
+    net: 'Printer LAN/WiFi — masukkan alamat IP printer dan port (umumnya 9100), lalu tekan Hubungkan.',
+    ble: 'Pastikan Bluetooth aktif dan printer sudah dipasangkan (paired) dengan tablet ini.',
+    usb: 'Hubungkan printer melalui kabel USB/OTG sebelum memindai.',
+  };
+
+  const _renderDeviceList = () =>
+    devices.length === 0 ? (
+      <AppText category="c1" appearance="hint" style={{ marginVertical: 8 }}>
+        {selectedValue === 'net'
+          ? 'Tidak ada printer terdeteksi otomatis — isi Host & Port di atas secara manual.'
+          : 'Tidak ada printer ditemukan. Pastikan printer menyala, lalu buka ulang halaman ini.'}
+      </AppText>
+    ) : (
+      <View style={styles.pickerFrame}>
+        <Picker
+          selectedValue={selectedPrinter}
+          onValueChange={setSelectedPrinter}>
+          {devices.map((item, index) => (
+            <Picker.Item
+              label={item.device_name}
+              value={item}
+              key={`printer-item-${index}`}
+            />
+          ))}
+        </Picker>
+      </View>
+    );
+
   const _renderNet = () => (
     <View
       style={{ flex: 1, paddingVertical: 8, marginBottom: keyboardSize + 20 }}>
       <View style={styles.rowDirection}>
-        <AppText>Host: </AppText>
-        <TextInput
+        <AppText category="s1" style={styles.inputLabel}>
+          Host:
+        </AppText>
+        <AppInput
           placeholder="192.168.100.19"
           onChangeText={handleChangeHostAndPort('host')}
-          style={{ width: '100%' }}
+          style={{ flex: 1 }}
           defaultValue="192.168.1."
         />
       </View>
       <View style={styles.rowDirection}>
-        <AppText>Port: </AppText>
-        <TextInput
+        <AppText category="s1" style={styles.inputLabel}>
+          Port:
+        </AppText>
+        <AppInput
           keyboardType="numeric"
           placeholder="9100"
           onChangeText={handleChangeHostAndPort('port')}
-          style={{ width: '100%' }}
+          style={{ flex: 1 }}
           defaultValue={'9100'}
         />
       </View>
-      <Picker selectedValue={selectedPrinter} onValueChange={setSelectedPrinter}>
-        {devices.map((item, index) => (
-          <Picker.Item
-            label={item.device_name}
-            value={item}
-            key={`printer-item-${index}`}
-          />
-        ))}
-      </Picker>
+      <AppText category="label" appearance="hint" style={{ marginTop: 8 }}>
+        PRINTER TERDETEKSI DI JARINGAN
+      </AppText>
+      {_renderDeviceList()}
     </View>
   );
 
   const _renderOther = () => (
-    <Picker selectedValue={selectedPrinter} onValueChange={setSelectedPrinter}>
-      {devices.map((item, index) => (
-        <Picker.Item
-          label={item.device_name}
-          value={item}
-          key={`printer-item-${index}`}
-        />
-      ))}
-    </Picker>
+    <View style={{ paddingVertical: 8 }}>
+      <AppText category="label" appearance="hint">
+        PRINTER DITEMUKAN
+      </AppText>
+      {_renderDeviceList()}
+    </View>
   );
 
   return (
@@ -341,20 +373,27 @@ export default function PrinterRoute() {
               <AppText category="h5">Printer Device</AppText>
             </View>
             <AppDivider style={{ marginBottom: 16 }} />
-            <AppText category="h6">Select printer type: </AppText>
-            <Picker
-              selectedValue={selectedValue}
-              onValueChange={handleChangePrinterType}>
-              {Object.keys(printerList).map((item, index) => (
-                <Picker.Item
-                  label={renderDeviceType(item)}
-                  value={item}
-                  key={`printer-type-item-${index}`}
-                />
-              ))}
-            </Picker>
+            <AppText category="h6">Pilih tipe printer</AppText>
+            <View style={[styles.pickerFrame, { marginTop: 8 }]}>
+              <Picker
+                selectedValue={selectedValue}
+                onValueChange={handleChangePrinterType}>
+                {Object.keys(printerList).map((item, index) => (
+                  <Picker.Item
+                    label={renderDeviceType(item)}
+                    value={item}
+                    key={`printer-type-item-${index}`}
+                  />
+                ))}
+              </Picker>
+            </View>
+            <AppText category="c1" appearance="hint" style={{ marginTop: 6 }}>
+              {typeHints[selectedValue]}
+            </AppText>
             <View style={styles.section}>
-              <AppText category="h6">Select printer: </AppText>
+              <AppText category="h6" style={{ marginTop: 16 }}>
+                Pilih printer
+              </AppText>
               {selectedValue === 'net' ? _renderNet() : _renderOther()}
             </View>
           </ScrollView>
@@ -363,16 +402,15 @@ export default function PrinterRoute() {
             disabled={!selectedPrinter?.device_name}
             onPress={handleConnectSelectedPrinter}
             status="info"
-            appearance="outline"
             style={{ marginBottom: 16 }}>
-            Connect
+            Hubungkan Printer
           </AppButton>
           <AppButton
             disabled={!selectedPrinter?.device_name}
             onPress={handlePrint}
             status="info"
             appearance="outline">
-            Print sample
+            Cetak Tes Print
           </AppButton>
         </View>
       </AppLayout>
@@ -414,5 +452,16 @@ const styles = StyleSheet.create({
   rowDirection: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: 12,
+  },
+  inputLabel: {
+    width: 56,
+  },
+  // Frames the native Pickers so they read as form fields (match AppInput).
+  pickerFrame: {
+    borderWidth: 1,
+    borderColor: '#E4E9F2',
+    borderRadius: 4,
+    backgroundColor: '#F7F9FC',
   },
 });

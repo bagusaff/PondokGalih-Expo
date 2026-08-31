@@ -38,37 +38,25 @@ function OrderMenuCardInner({ data }: OrderMenuCardProps) {
           alignItems: 'center',
           marginBottom: verticalScale(5),
         }}>
+        {/* flex:1 column WITHOUT flexWrap (2026-08-31): the legacy wrap
+            container let long names escape past the qty buttons. */}
         <View
           style={{
             flexDirection: 'column',
-            alignItems: 'flex-start',
-            flexWrap: 'wrap',
             flex: 1,
+            marginRight: 8,
           }}>
-          <View style={{ flexDirection: 'row' }}>
-            {data?.original_name && data?.original_name !== data?.name ? (
-              <AppText
-                category="h6"
-                numberOfLines={1}
-                style={{
-                  fontWeight: 'bold',
-                  maxWidth: scale(100),
-                  fontSize: scale(8),
-                }}>
-                {`${data?.original_name} `}
-              </AppText>
-            ) : null}
-            <AppText
-              category="h6"
-              numberOfLines={1}
-              style={{
-                fontWeight: 'bold',
-                maxWidth: scale(100),
-                fontSize: scale(8),
-              }}>
-              {data.name}
-            </AppText>
-          </View>
+          <AppText
+            category="h6"
+            numberOfLines={1}
+            style={{
+              fontWeight: 'bold',
+              fontSize: scale(8),
+            }}>
+            {data?.original_name && data?.original_name !== data?.name
+              ? `${data.original_name} ${data.name}`
+              : data.name}
+          </AppText>
 
           <AppText category="p1" appearance="hint" style={{ fontSize: scale(6) }}>
             {currencyFormatter(data.totalPrice)}

@@ -375,8 +375,11 @@ export function OrderModal({
   );
 
   return (
+    // Fullscreen dialog: manages the keyboard itself (legacy keyboardSize
+    // margin), so it opts out of AppModal's keyboard padding.
     <AppModal
       visible={isOpen}
+      avoidKeyboard={false}
       contentStyle={{ width, height }}>
       <View style={[styles.Container, { width, height }]}>
         <View style={styles.HeaderWrapper}>

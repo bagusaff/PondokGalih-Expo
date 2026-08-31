@@ -40,11 +40,25 @@ export default function TabsLayout() {
     <MaterialTopTabs
       initialRouteName="home"
       tabBar={(props: any) => <AppTopTabBar {...props} labels={labels} />}
-      screenOptions={{ swipeEnabled: false }}>
+      // lazy: off-screen tabs don't mount until visited (perf + keeps the
+      // hidden history page from ever rendering).
+      screenOptions={{ swipeEnabled: false, lazy: true }}>
       <MaterialTopTabs.Screen name="home" />
       <MaterialTopTabs.Screen name="billing" />
-      <MaterialTopTabs.Screen name="history" />
-      <MaterialTopTabs.Screen name="setting" />
+      {/* When hidden, history goes LAST in the pager so the Billing->Setting
+          slide doesn't travel through it (the route must stay registered —
+          the file exists — but nothing adjacent ever animates past it). */}
+      {hideHistory ? (
+        <>
+          <MaterialTopTabs.Screen name="setting" />
+          <MaterialTopTabs.Screen name="history" />
+        </>
+      ) : (
+        <>
+          <MaterialTopTabs.Screen name="history" />
+          <MaterialTopTabs.Screen name="setting" />
+        </>
+      )}
     </MaterialTopTabs>
   );
 }

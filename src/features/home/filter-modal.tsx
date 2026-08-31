@@ -1,4 +1,4 @@
-import { FlatList, StyleSheet, View } from 'react-native';
+import { FlatList, StyleSheet, useWindowDimensions, View } from 'react-native';
 
 import { AppButton, AppDivider, AppModal, AppText } from '@/components/ui';
 import {
@@ -8,6 +8,9 @@ import {
 } from '@/state';
 
 // 1:1 port of components/modals/FilterModal.js (category picker dialog).
+// Owner feedback (2026-08-31): wider + taller than the legacy 50% card,
+// centered, backdrop tap closes. Card is absolutely sized so the backdrop
+// around it stays tappable.
 
 type FilterModalProps = {
   isOpen: boolean;
@@ -17,6 +20,7 @@ type FilterModalProps = {
 
 export function FilterModal({ isOpen, hideModal, data }: FilterModalProps) {
   const dispatch = useAppDispatch();
+  const { width, height } = useWindowDimensions();
 
   const handleFilter = (id: number) => {
     dispatch(filterMenuPerCategory(id));
@@ -25,8 +29,12 @@ export function FilterModal({ isOpen, hideModal, data }: FilterModalProps) {
   };
 
   return (
-    <AppModal visible={isOpen} onBackdropPress={hideModal} contentStyle={styles.ContentWrapper}>
-      <View style={styles.InnerWrapper}>
+    <AppModal visible={isOpen} onBackdropPress={hideModal}>
+      <View
+        style={[
+          styles.InnerWrapper,
+          { width: 0.6 * width, height: 0.85 * height },
+        ]}>
         <FlatList
           ListHeaderComponent={
             <View style={{ backgroundColor: '#FFF' }}>
@@ -57,14 +65,8 @@ export function FilterModal({ isOpen, hideModal, data }: FilterModalProps) {
 }
 
 const styles = StyleSheet.create({
-  ContentWrapper: {
-    width: '100%',
-    alignItems: 'center',
-  },
   InnerWrapper: {
     backgroundColor: '#fff',
-    width: '50%',
-    maxHeight: '80%',
     padding: 25,
     borderRadius: 15,
     boxShadow: '0 4px 10px rgba(0, 0, 0, 0.25)',

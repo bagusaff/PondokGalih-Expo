@@ -1,6 +1,5 @@
-import { FlashList } from '@shopify/flash-list';
 import { useEffect, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { FlatList, StyleSheet, View } from 'react-native';
 
 import { AppIcon, AppInput, AppLayout, AppSpinner, AppText } from '@/components/ui';
 import { EmptyMenu } from '@/features/home/empty-menu';
@@ -69,7 +68,10 @@ export default function HomeRoute() {
             Daftar Menu
           </AppText>
           {!loading ? (
-            <FlashList<any>
+            // FlatList, not FlashList (2026-08-31): FlashList v2 flows grid
+            // columns independently (masonry), which staggered the cards and
+            // left blank holes; FlatList aligns rows like the legacy app.
+            <FlatList
               data={
                 keyword != ''
                   ? searchedMenu
@@ -78,11 +80,14 @@ export default function HomeRoute() {
                     : filteredMenu
               }
               ListEmptyComponent={EmptyMenu}
-              renderItem={({ item }) => (
-                <MenuCard data={item} isFavourite={isFavourite} />
-              )}
-              keyExtractor={(item) => String(item.id)}
+              renderItem={({ item }) =>
+                item ? <MenuCard data={item} isFavourite={isFavourite} /> : null
+              }
+              keyExtractor={(item, index) => String(item?.id ?? index)}
+              initialNumToRender={5}
+              maxToRenderPerBatch={5}
               numColumns={3}
+              removeClippedSubviews
             />
           ) : (
             <View style={styles.Spinner}>

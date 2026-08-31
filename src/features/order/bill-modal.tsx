@@ -1,11 +1,12 @@
 import moment from 'moment';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   Alert,
   ScrollView,
   StyleSheet,
   useWindowDimensions,
   View,
+  type TextInput,
 } from 'react-native';
 import {
   BLEPrinter,
@@ -65,6 +66,9 @@ export function BillModal({ isOpen, hideModal }: BillModalProps) {
   const [name, setName] = useState('');
   const [table, setTable] = useState('');
 
+  const nameRef = useRef<TextInput>(null);
+  const tableRef = useRef<TextInput>(null);
+
   const isBillSelected =
     Object.keys(selectedBill).length !== 0 &&
     selectedBill?.methodType == 'updateBill';
@@ -73,6 +77,10 @@ export function BillModal({ isOpen, hideModal }: BillModalProps) {
     if (isOpen) {
       setName(selectedBill?.name || '');
       setTable(selectedBill?.no || '');
+      // UX (2026-08-31): focus the name field as soon as the dialog is up.
+      // Delayed .focus() — autoFocus is unreliable inside Android modals.
+      const t = setTimeout(() => nameRef.current?.focus(), 250);
+      return () => clearTimeout(t);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
@@ -175,7 +183,9 @@ export function BillModal({ isOpen, hideModal }: BillModalProps) {
   };
 
   return (
-    <AppModal visible={isOpen}>
+    // Owner feedback (2026-08-31): backdrop tap closes (legacy only closed
+    // via the hardware back button).
+    <AppModal visible={isOpen} onBackdropPress={handleHideModal}>
       <View style={[styles.InnerWrapper, { width: (3 / 4) * width }]}>
         <View style={styles.HeaderContainer}>
           <AppButton
@@ -227,10 +237,14 @@ export function BillModal({ isOpen, hideModal }: BillModalProps) {
                   justifyContent: 'space-between',
                 }}>
                 <AppInput
+                  ref={nameRef}
                   placeholder="Nama Pelanggan"
                   style={{ width: '100%' }}
                   value={name}
                   onChangeText={setName}
+                  returnKeyType="next"
+                  submitBehavior="submit"
+                  onSubmitEditing={() => tableRef.current?.focus()}
                 />
               </View>
             </View>
@@ -254,10 +268,12 @@ export function BillModal({ isOpen, hideModal }: BillModalProps) {
                   justifyContent: 'space-between',
                 }}>
                 <AppInput
+                  ref={tableRef}
                   placeholder="Nomor Meja"
                   style={{ width: '100%' }}
                   value={table}
                   onChangeText={setTable}
+                  returnKeyType="done"
                 />
               </View>
             </View>
