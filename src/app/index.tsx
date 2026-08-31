@@ -18,10 +18,12 @@ export default function SplashRoute() {
 
 	useEffect(() => {
 		SplashScreen.hideAsync();
+		// replace on both branches: the boot flow must leave no history, so
+		// hardware back on Home exits the app (legacy behavior).
 		if (!isLoggedIn) {
 			router.replace("/login");
 		} else {
-			router.navigate("/prefetch");
+			router.replace("/prefetch");
 		}
 		// Legacy effect ran once on mount.
 		// eslint-disable-next-line react-hooks/exhaustive-deps

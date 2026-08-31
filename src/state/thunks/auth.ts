@@ -31,8 +31,10 @@ export const loginHandle =
       .then((res) => {
         dispatch(loginSuccess({ ...res.data, shift }));
         // Legacy navigated to 'Splash' in the Auth stack — which is
-        // PreFetchScreen (Auth.stack.js registers PreFetch under that name).
-        navigate('/prefetch');
+        // PreFetchScreen. replace (not navigate) so the login screen leaves
+        // the history — hardware back on Home must exit the app, not
+        // return to login.
+        replace('/prefetch');
       })
       .catch((err) => {
         console.log('message', err.response);
