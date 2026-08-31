@@ -41,6 +41,7 @@
     "react-native-safe-area-context": "~5.7.0",
     "react-native-screens": "~4.26.0",
     "react-native-svg": "~15.13.0",
+    "react-native-tab-view": "^4.3.2",
     "react-native-thermal-receipt-printer-image-qr": "^0.1.12",
     "react-native-toast-message": "^2.5.0",
     "react-native-web": "~0.21.0",

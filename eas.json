@@ -6,7 +6,7 @@
     "base": {
       "platform": "android",
       "env": {
-        "EXPO_PUBLIC_API_URL": "http://103.175.218.59/api"
+        "EXPO_PUBLIC_API_URL": "https://legacy.bebekpondokgalih.com/api"
       }
     },
     "branded-dev": {
